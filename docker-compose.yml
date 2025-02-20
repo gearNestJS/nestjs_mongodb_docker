@@ -1,0 +1,26 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    container_name: nest_api
+    ports:
+      - 3000:3000
+    environment:
+      - PORT=3000
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo:latest
+    restart: always
+    container_name: mongo_db
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
