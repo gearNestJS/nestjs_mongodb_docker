@@ -11,3 +11,4 @@
 
 - [Create NestJS API using Typescript, MongoDB, Docker, Docker Compose](https://dev.to/nyomansunima/create-nestjs-api-using-typescript-mongodb-docker-docker-compose-29k9)
 - [Build a CRUD API using NestJS, MongoDB, Docker & Docker Compose](https://medium.com/@koladev/build-a-crud-api-using-nestjs-mongodb-docker-docker-compose-a8966ff126ca)
+- [Building Modern APIs with Docker, NestJS, MongoDB, and Mongoose: A Comprehensive Guide for Developers](https://marksabelita.hashnode.dev/building-modern-apis-with-docker-nestjs-mongodb-and-mongoose-a-comprehensive-guide-for-developers)

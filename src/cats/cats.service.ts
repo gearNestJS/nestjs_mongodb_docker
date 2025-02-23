@@ -1,19 +1,20 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Cat } from 'src/schemas/cat.schema';
-import { CreateCatDto } from './create-cat.dto';
+import { CreateCatDto, UpdateCatDto } from './dtos';
 
 @Injectable()
 export class CatsService {
   constructor(@InjectModel(Cat.name) private catModel: Model<Cat>) {}
 
   /** Find one cat */
-  async findOne(name: string): Promise<Cat> {
-    const findedCat = await this.catModel.findOne({ name }).exec();
+  async findOne(id: string): Promise<Cat> {
+    this.validateId(id);
 
+    const findedCat = await this.catModel.findOne({ _id: id }).exec();
     if (!findedCat) {
-      throw new NotFoundException(`Cat with name ${name} not found!`);
+      throw new NotFoundException(`Cat with id ${id} not found!`);
     }
 
     return findedCat;
@@ -31,23 +32,38 @@ export class CatsService {
     return await createdCat.save();
   }
 
-  // TODO: add method
   /** Update cat */
-  //   async update(name: string, body: UpdateUserInput): Promise<UserPayload> {
-  //     await this.userModel.updateOne({ _id: id }, body);
-  //     const updatedUser = this.userModel.findById(id);
+  async update(id: string, updateCatDto: UpdateCatDto): Promise<Cat> {
+    this.validateId(id);
 
-  //     return updatedUser;
-  //   }
+    const updatedCat = await this.catModel.findByIdAndUpdate(id, updateCatDto, {
+      new: true,
+    });
 
-  /** Delete cat */
-  async delete(name: string): Promise<void> {
-    const findedCat = await this.catModel.findOne({ name }).exec();
-
-    if (!findedCat) {
-      throw new NotFoundException(`Cat with name ${name} not found!`);
+    if (!updatedCat) {
+      throw new HttpException('Cat not found', 404);
     }
 
-    await this.catModel.deleteOne({ name });
+    return updatedCat;
+  }
+
+  /** Delete cat */
+  async delete(id: string): Promise<Cat> {
+    this.validateId(id);
+
+    const foundCat = await this.catModel.findByIdAndDelete(id);
+    if (!foundCat) {
+      throw new HttpException('Cat not found', 404);
+    }
+
+    return foundCat;
+  }
+
+  /** Check if valid mongo id */
+  private validateId(id: string): void {
+    const isIdValid = mongoose.Types.ObjectId.isValid(id);
+    if (!isIdValid) {
+      throw new HttpException('Invalid id!', 404);
+    }
   }
 }

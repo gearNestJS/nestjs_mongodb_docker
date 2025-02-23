@@ -1,7 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { CatsService } from './cats.service';
 import { Cat } from 'src/schemas/cat.schema';
-import { CreateCatDto } from './create-cat.dto';
+import { CreateCatDto } from './dtos/create-cat.dto';
+import { UpdateCatDto } from './dtos';
 
 @Controller('cats')
 export class CatsController {
@@ -12,9 +23,10 @@ export class CatsController {
     return await this.catsService.findAll();
   }
 
-  @Get(':name')
-  async findOne(@Param('name') name: string): Promise<Cat> {
-    return await this.catsService.findOne(name);
+  @Get(':id')
+  @UsePipes(new ValidationPipe())
+  async findOne(@Param('id') id: string): Promise<Cat> {
+    return await this.catsService.findOne(id);
   }
 
   @Post()
@@ -22,8 +34,16 @@ export class CatsController {
     return await this.catsService.create(createCatDto);
   }
 
-  @Delete(':name')
-  deleteUser(@Param('name') name: string) {
-    return this.catsService.delete(name);
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateCatDto: UpdateCatDto,
+  ): Promise<Cat> {
+    return await this.catsService.update(id, updateCatDto);
+  }
+
+  @Delete(':id')
+  deleteUser(@Param('id') id: string): Promise<Cat> {
+    return this.catsService.delete(id);
   }
 }
